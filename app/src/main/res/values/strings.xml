@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ViewPager-master</string>
+
+    <string-array name="banner">
+        <item>http://dl.bizhi.sogou.com/images/2012/03/15/300648.jpg</item>
+        <item>http://www.deskcar.com/desktop/cartoon/china/2012317210314/17.jpg</item>
+        <item>http://www.deskcar.com/desktop/else/2010419233148/32.jpg</item>
+    </string-array>
+</resources>
