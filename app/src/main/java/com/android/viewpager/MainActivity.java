@@ -23,7 +23,8 @@ public class MainActivity extends AppCompatActivity {
         mViewPager= (LViewPager) findViewById(R.id.bvp);
         mViewPager.setPoint(Point.LINE);
         mViewPager.setAdapter(new MainAdapter(this,arrayList));
-//        mViewPager.startTimingTasks();
+        mViewPager.startTimingTasks();
+        mViewPager.setCurrentItem(3);
 
     }
 }

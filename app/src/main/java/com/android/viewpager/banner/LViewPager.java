@@ -183,7 +183,20 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
     }
 
     /**
+     * 隐藏点
+     * 默认显示圆形点
+     * @param active
+     */
+    public void dismissPoint(boolean active){
+        if(active){
+            mPointCircle.setVisibility(View.GONE);
+            mPointLine.setVisibility(View.GONE);
+        }
+    }
+
+    /**
      * 设置适配器
+     * 默认从第一位开始
      * @param adapter
      */
     public void setAdapter(PagerAdapter adapter){
@@ -203,7 +216,7 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
      * @param item
      */
     public void setCurrentItem(int item){
-        mViewPager.setCurrentItem(item);
+        mViewPager.setCurrentItem(item+1);
     }
 
     /**
@@ -212,7 +225,7 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
      * @param smoothScroll
      */
     public void setCurrentItem(int item, boolean smoothScroll){
-        mViewPager.setCurrentItem(item, smoothScroll);
+        mViewPager.setCurrentItem(item+1, smoothScroll);
     }
 
 
