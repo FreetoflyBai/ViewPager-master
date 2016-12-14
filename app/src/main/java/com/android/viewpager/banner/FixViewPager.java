@@ -12,48 +12,44 @@ import android.widget.LinearLayout;
 
 import com.android.viewpager.R;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Description:
+ * Description: ViewPager 包装类
+ *              包含无限循环滑动、定时滑动、定制指示点
  * Author     : kevin.bai
- * Time       : 2016/12/8 18:04
+ * Time       : 2016/12/13 19:36
  * QQ         : 904869397@qq.com
  */
 
-public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChangeListener{
-
+public class FixViewPager extends LinearLayout implements ViewPager.OnPageChangeListener {
     ViewPager mViewPager;
-    LinearLayout mPointCircle;
-    LinearLayout mPointLine;
+    LinearLayout mCirclePoint;
+    LinearLayout mLinePoint;
     Timer mTimer=new Timer();
     Handler mHandler =new Handler(Looper.getMainLooper());
     Context mContext;
-    Point mPoint=Point.CIRCLE;
-    List<T> mList=new ArrayList<T>();
-    LAdapter<T> mAdapter;
+    FixPoint mPoint= FixPoint.CIRCLE;
 
-    public LViewPager(Context context) {
+    public FixViewPager(Context context) {
         super(context);
         initView(context);
     }
 
-    public LViewPager(Context context, AttributeSet attrs) {
+    public FixViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView(context);
     }
 
     private void initView(Context context){
         this.mContext=context;
-        View view= View.inflate(context,R.layout.view_viewpager,null);
+        View view= View.inflate(context, R.layout.view_viewpager,null);
         mViewPager= (ViewPager) view.findViewById(R.id.vp_banner);
         mViewPager.addOnPageChangeListener(this);
-        mPointCircle = (LinearLayout) view.findViewById(R.id.ll_point_circle);
-        mPointLine= (LinearLayout) view.findViewById(R.id.ll_point_line);
-        this.addView(view);
+        mCirclePoint = (LinearLayout) view.findViewById(R.id.ll_point_circle);
+        mLinePoint = (LinearLayout) view.findViewById(R.id.ll_point_line);
+        addView(view);
 
     }
 
@@ -64,7 +60,7 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
         if(mTimer==null){
             return;
         }
-        if(mList==null||mList.size()==0){
+        if(mViewPager==null||mViewPager.getAdapter().getCount()==0){
             return;
         }
         mTimer.schedule(new TimerTask() {
@@ -75,7 +71,7 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
                     public void run() {
                         int curPosition=mViewPager.getCurrentItem();
                         int nextPosition=curPosition+1;
-                        if(curPosition==mList.size()){
+                        if(curPosition==mViewPager.getAdapter().getCount()){
                             nextPosition=0;
                         }
                         mViewPager.setCurrentItem(nextPosition);
@@ -92,6 +88,9 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
         if(mTimer==null){
             return;
         }
+        if(mViewPager==null||mViewPager.getAdapter().getCount()==0){
+            return;
+        }
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -100,7 +99,7 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
                     public void run() {
                         int curPosition=mViewPager.getCurrentItem();
                         int nextPosition=curPosition+1;
-                        if(curPosition==mViewPager.getChildCount()){
+                        if(curPosition==mViewPager.getAdapter().getCount()){
                             nextPosition=0;
                         }
                         mViewPager.setCurrentItem(nextPosition);
@@ -123,92 +122,82 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
      * 设置点类型
      * @param point
      */
-    public void setPoint(Point point){
+    public void setPoint(FixPoint point){
         mPoint=point;
     }
 
     /**
-     * 根据传入数据初始化指示点
-     *
-     * @param list
+     * 设置point相对位置
+     * 对Circle有效
+     * @param gravity
      */
-    private void initPoints(List<T> list){
-        if(list==null||list.size()==0){
-            return;
-        }
-        if(mPoint== Point.CIRCLE){
-            initPointCircle(list);
-        }else{
-            initPointLine(list);
+    public void setPointGravity(int gravity){
+        mCirclePoint.setGravity(gravity);
+    }
+
+
+    /**
+     * 隐藏指示点
+     * 默认显示圆形点
+     * @param active
+     */
+    public void dismissPoint(boolean active){
+        if(active){
+            mCirclePoint.setVisibility(View.GONE);
+            mLinePoint.setVisibility(View.GONE);
         }
     }
 
-    private void initPointCircle(List<T> list){
-        mPointCircle.setVisibility(View.VISIBLE);
-        mPointLine.setVisibility(View.GONE);
-        for (int i = 0; i < list.size(); i++) {
+    /**
+     * 初始化指示点
+     */
+    private void initPoints(int size){
+        if(size<=0){
+            return;
+        }
+        if(mPoint== FixPoint.CIRCLE){
+            initCirclePoint(size);
+        }else{
+            initLinePoint(size);
+        }
+    }
+
+    /**
+     * 初始化圆形指示点
+     * @param size
+     */
+    private void initCirclePoint(int size){
+        mCirclePoint.setVisibility(View.VISIBLE);
+        mLinePoint.setVisibility(View.GONE);
+        for (int i = 0; i < size; i++) {
             ImageView text=new ImageView(mContext);
             LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 0, 5, 0);
             text.setLayoutParams(params);
             text.setImageResource(i==0?R.drawable.banner_point_select:R.drawable.banner_point_unselect);
-            mPointCircle.addView(text);
+            mCirclePoint.addView(text);
         }
     }
 
-    private void initPointLine(List<T> list){
-        mPointCircle.setVisibility(View.GONE);
-        mPointLine.setVisibility(View.VISIBLE);
-        for (int i = 0; i < list.size(); i++) {
+    /**
+     * 初始化线性指示点
+     * @param size
+     */
+    private void initLinePoint(int size){
+        mCirclePoint.setVisibility(View.GONE);
+        mLinePoint.setVisibility(View.VISIBLE);
+        for (int i = 0; i < size; i++) {
             ImageView text=new ImageView(mContext);
             LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
             params.weight=1;
-            params.setMargins(0, 0, (i!=list.size()-1)?5:0, 0);
+            params.setMargins(0, 0, (i!=size-1)?5:0, 0);
             text.setLayoutParams(params);
             text.setBackgroundResource(i==0?R.color.colorAccent:R.color.colorPrimary);
-            mPointLine.addView(text);
+            mLinePoint.addView(text);
         }
 
-    }
-
-    /**
-     * 设置point位置
-     * 对Circle有效
-     * @param gravity
-     */
-    public void setPointGravity(int gravity){
-        mPointCircle.setGravity(gravity);
-    }
-
-    /**
-     * 隐藏点
-     * 默认显示圆形点
-     * @param active
-     */
-    public void dismissPoint(boolean active){
-        if(active){
-            mPointCircle.setVisibility(View.GONE);
-            mPointLine.setVisibility(View.GONE);
-        }
-    }
-
-    /**
-     * 设置适配器
-     * 默认从第一位开始
-     * @param adapter
-     */
-    public void setAdapter(PagerAdapter adapter){
-        if(adapter!=null&&adapter instanceof LAdapter){
-            mAdapter= (LAdapter<T>) adapter;
-            mList=mAdapter.getList();
-            initPoints(mAdapter.getPointList());
-            mViewPager.setAdapter(mAdapter);
-            mViewPager.setCurrentItem(1, false);
-        }else{
-            throw new IllegalArgumentException("Please extends LAdapter!!");
-        }
     }
 
     /**
@@ -229,9 +218,20 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
     }
 
 
+    /**
+     * 设置适配器
+     * 默认从第一位开始
+     * @param adapter
+     */
+    public void setAdapter(PagerAdapter adapter){
+        mViewPager.setAdapter(adapter);
+        mViewPager.setCurrentItem(1, false);
+        initPoints(adapter.getCount()-2);
+    }
+
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        drawPoint(position);
+        changePoint(position);
         changePage(position,positionOffsetPixels);
     }
 
@@ -252,10 +252,10 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
      */
     private void changePage(int position,int positionOffsetPixels){
         if (positionOffsetPixels == 0.0) {
-            if (position == mList.size() - 1) {
+            if (position == mViewPager.getAdapter().getCount() - 1) {
                 mViewPager.setCurrentItem(1, false);
             } else if (position == 0) {
-                mViewPager.setCurrentItem(mList.size() - 2, false);
+                mViewPager.setCurrentItem(mViewPager.getAdapter().getCount() - 2, false);
             } else {
                 mViewPager.setCurrentItem(position);
             }
@@ -263,23 +263,26 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
     }
 
     /**
-     * 绘制当前点
+     * 将超出界限的item替换为正确的点
      * @param position
      */
-    private void drawPoint(int position){
-        if(mAdapter==null){
-           return;
+    private void changePoint(int position){
+        if (position == mViewPager.getAdapter().getCount() - 1) {
+            position=1;
+        } else if (position == 0) {
+            position= mViewPager.getAdapter().getCount()-2;
+        } else {
+            position=position-1;
         }
-        position=mAdapter.getPointPosition(position);
-        if(mPoint== Point.CIRCLE){
-            for (int i = 0; i < mPointCircle.getChildCount(); i++) {
-                ImageView text=(ImageView) mPointCircle.getChildAt(i);
+        if(mPoint== FixPoint.CIRCLE){
+            for (int i = 0; i < mCirclePoint.getChildCount(); i++) {
+                ImageView text=(ImageView) mCirclePoint.getChildAt(i);
                 text.setImageResource(
                         i==position?R.drawable.banner_point_select:R.drawable.banner_point_unselect);
             }
         }else{
-            for (int i = 0; i < mPointLine.getChildCount(); i++) {
-                ImageView text=(ImageView) mPointLine.getChildAt(i);
+            for (int i = 0; i < mLinePoint.getChildCount(); i++) {
+                ImageView text=(ImageView) mLinePoint.getChildAt(i);
                 text.setBackgroundResource(
                         i==position?R.color.colorAccent:R.color.colorPrimary);
             }
@@ -292,3 +295,4 @@ public class LViewPager<T> extends LinearLayout implements ViewPager.OnPageChang
         endTimeTasks();
     }
 }
+

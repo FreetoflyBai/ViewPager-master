@@ -1,5 +1,5 @@
 package com.android.viewpager.banner;
 
-public enum Point {
+public enum FixPoint {
         LINE,CIRCLE
 }
