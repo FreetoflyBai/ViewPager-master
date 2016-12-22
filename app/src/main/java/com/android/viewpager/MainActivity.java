@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
         String[] arrayList=getResources().getStringArray(R.array.banner);
         mViewPager= (FixViewPager) findViewById(R.id.bvp);
-        mViewPager.setPoint(FixPoint.LINE);
+        mViewPager.setPoint(FixPoint.CIRCLE);
         mViewPager.setAdapter(new MainAdapter(Arrays.asList(arrayList)));
         mViewPager.startTimingTasks();
 
