@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.android.viewpager.R;
+import com.android.viewpager.animation.ZoomOutPageTransformer;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -215,6 +216,15 @@ public class FixViewPager extends LinearLayout implements ViewPager.OnPageChange
      */
     public void setCurrentItem(int item, boolean smoothScroll){
         mViewPager.setCurrentItem(item+1, smoothScroll);
+    }
+
+    /**
+     * 设置ViewPager切换动画
+     * @param reverseDrawingOrder
+     * @param transformer
+     */
+    public void setPageTransformer(boolean reverseDrawingOrder, ViewPager.PageTransformer transformer){
+        mViewPager.setPageTransformer(reverseDrawingOrder,transformer);
     }
 
 

@@ -1,4 +1,4 @@
-package com.android.viewpager.banner;
+package com.android.viewpager.util;
 
 import android.support.design.widget.Snackbar;
 import android.view.View;

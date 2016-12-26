@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.android.viewpager.banner.SnackBarUtils;
+import com.android.viewpager.util.SnackBarUtils;
 import com.android.viewpager.banner.FixAdapter;
 import com.bumptech.glide.Glide;
 
